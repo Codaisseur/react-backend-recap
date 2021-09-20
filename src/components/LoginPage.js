@@ -1,9 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
+import { useHistory } from "react-router-dom";
 
 export default function LoginForm(props) {
   const [email, set_email] = useState("");
   const [password, set_password] = useState("");
+  const history = useHistory();
 
   const onChangeEmail = event => {
     set_email(event.target.value);
@@ -13,9 +15,25 @@ export default function LoginForm(props) {
   };
 
   const submitLogin = async event => {
+    event.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:4000/auth/login", {
+        email: email,
+        password: password,
+      });
+      console.log(response);
+      // setToken(response.data.token);
+      props.tokenSetter({
+        token: response.data.token,
+        name: response.data.name,
+        email: response.data.email,
+      });
+      history.push("/");
+    } catch (e) {
+      console.log(e.message);
+    }
     console.log("email and pass", email, password);
   };
-
   return (
     <div className='LoginForm'>
       <form onSubmit={submitLogin}>
